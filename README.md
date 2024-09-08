@@ -9,3 +9,6 @@
 - create docker image by running the docker file: `docker build -t program_name program_path` "." for current path
 - check image details: `docker image ls`
 - run the program from the container: `docker run program_name`
+
+### containers cleanup
+- clear all running containers `docker stop $(docker ps -qa); docker rm $(docker ps -qa); docker rmi -f $(docker images -qa); docker volume rm $(docker volume ls -q); docker network rm $(docker network ls -q) 2>/dev/null`
