@@ -1,11 +1,8 @@
 all:
-	docker-compose -f ./srcs/docker-compose.yml up
+	@docker-compose up --build
 
 show:
-	docker image ls -a && echo "\n" && docker ps -a
-
-run:
-	docker run -d -p 80:80 -p 8443:443 nginx_server
+	@docker image ls -a && echo "\n" && docker ps -a
 
 clean:
 	@docker stop $$(docker ps -qa); \
