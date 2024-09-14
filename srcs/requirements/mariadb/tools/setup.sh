@@ -1,10 +1,5 @@
 #!/bin/bash
 
-DB_NAME=thedatabase
-DB_USER=theuser
-DB_PASSWORD=abc
-DB_PASS_ROOT=123
-
 service mariadb start
 
 mariadb -v -u root << EOF
