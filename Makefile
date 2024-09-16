@@ -1,5 +1,5 @@
 all:
-	@docker-compose -f ./srcs/docker-compose.yml up --build
+	# @docker-compose -f ./srcs/docker-compose.yml up --build
 
 show:
 	@docker image ls -a && echo "\n" && docker ps -a

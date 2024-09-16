@@ -13,6 +13,9 @@
 ### containers cleanup
 - clear all running containers: `docker stop $(docker ps -qa); docker rm $(docker ps -qa); docker rmi -f $(docker images -qa); docker volume rm $(docker volume ls -q); docker network rm $(docker network ls -q) 2>/dev/null`
 
+### docker debug
+- `docker logs <containerID>`
+
 ### run muliple containers using docker-compose.yml
 - run docker compose: `docker-compose up`
 
@@ -27,6 +30,7 @@
 - `CMD` conatiner execute setup.sh and mysqld_safe (a script provided by MariaDB that starts the MariaDB server in a "safe" mode. It is often used to monitor the server and restart it in case of failure.)
 
 ### 50-server.cnf breakdown
+- It's a default file
 - file name: The numeric prefix (50-) is used to determine the load order of configuration files. Files are usually loaded in alphanumeric order, so having numbers at the beginning helps control the sequence.  The 50- prefix suggests that this is a mid-level priority configuration file.
 - `server` used for global settings that apply to all MariaDB server instances and plugins
 - `mysqld` main section for configuring the MariaDB server daemon (mysqld). The parameters listed here directly affect the behavior of the MariaDB server, all parameters in this case are default beside the port (port = 3306)
@@ -43,3 +47,11 @@
  - Sets a new password for the root user connecting from localhost to $DB_PASS_ROOT. This ensures the root user has the correct password set
 - `sleep 5` pause the script for 5 seconds to process SQL coomands above and then stop the service with `service mariadb stop`
 - `exec $@` The exec command replaces the current shell process with `$@` which represent in this case starting mysqld_safe to keep the container up
+
+## Wordpress
+
+### Dockerfile breakdown
+- `FROM` get debian:bullseye image
+- `EXPOSE` listen port 9000
+- `RUN` download all the dependencies for setting up wordpress: `ca-certificates`  package that provides a set of trusted Certificate Authority (CA) certificates used to verify SSL/TLS connections. `php7.4-fpm` FastCGI Process Manager, it is a version of PHP that is specifically designed to handle and manage web requests more efficiently using the FastCGI protocol. php7.4-fpm is a specific version of PHP designed to handle web requests efficiently and is often used in high-traffic, performance-oriented environments. `php7.4-mysql` is a PHP extension that provides MySQL database support for PHP 7.4. It allows PHP scripts to interact with MySQL databases, enabling them to perform operations like connecting to the database, executing queries, fetching data, and managing database records. This package is essential for any PHP application that needs to work with MySQL databases, such as WordPress or other web applications relying on MySQL for data storage.
+- `sed -i 's/str1/str2/g'` (Stream Editor) modify file content by replacing str1 with str2, flag i make the in file modification possible
