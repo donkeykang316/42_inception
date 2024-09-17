@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  nginx:
+    build:
+      context: ./nginx
+      args:
+        - DOMAIN_NAME=${DOMAIN_NAME}
+    container_name: nginx
+    restart: always
+    ports:
+      - '443:443'
+    volumes:
+      - wordpress_files:/var/www/html
+    depends_on:
+      - wordpress
+    networks:
+      - app-network
+
+  wordpress:
+    build: ./wordpress
+    container_name: wordpress
+    restart: always
+    environment:
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_HOST: mariadb:3306
+    secrets:
+      - mysql_user_password
+    volumes:
+      - wordpress_files:/var/www/html
+    depends_on:
+      - mariadb
+    networks:
+      - app-network
+
+  mariadb:
+    build: ./mariadb
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_ADMIN_USER: ${MYSQL_ADMIN_USER}
+    secrets:
+      - mysql_root_password
+      - mysql_user_password
+      - mysql_admin_password
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network
+
+volumes:
+  wordpress_files:
+  db_data:
+
+networks:
+  app-network:
+
+secrets:
+  mysql_root_password:
+    file: ./secrets/mysql_root_password.txt
+  mysql_user_password:
+    file: ./secrets/mysql_user_password.txt
+  mysql_admin_password:
+    file: ./secrets/mysql_admin_password.txt
