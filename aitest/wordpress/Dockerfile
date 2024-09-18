@@ -28,4 +28,4 @@ RUN sed -i "s/;daemonize = yes/daemonize = no/" /etc/php81/php-fpm.conf && \
 
 EXPOSE 9000
 
-CMD ["php-fpm81", "-F"]
+CMD ["php-fpm81", "-F", "--nodaemonize"]

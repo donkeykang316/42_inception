@@ -11,7 +11,7 @@ services:
     ports:
       - '443:443'
     volumes:
-      - wordpress_files:/var/www/html
+      - wordpress_files:/var/www/html  # Map entire /var/www/html
     depends_on:
       - wordpress
     networks:
@@ -24,11 +24,12 @@ services:
     environment:
       WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
       WORDPRESS_DB_USER: ${MYSQL_USER}
-      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_HOST: mariadb
+      WORDPRESS_DB_PASSWORD_FILE: /run/secrets/mysql_user_password
     secrets:
       - mysql_user_password
     volumes:
-      - wordpress_files:/var/www/html
+      - wordpress_files:/var/www/html  # Map entire /var/www/html
     depends_on:
       - mariadb
     networks:
@@ -42,12 +43,16 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_ADMIN_USER: ${MYSQL_ADMIN_USER}
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
+      MYSQL_USER_PASSWORD_FILE: /run/secrets/mysql_user_password
+      MYSQL_ADMIN_PASSWORD_FILE: /run/secrets/mysql_admin_password
     secrets:
       - mysql_root_password
       - mysql_user_password
       - mysql_admin_password
     volumes:
       - db_data:/var/lib/mysql
+      - ./mariadb/logs:/var/log/mysql
     networks:
       - app-network
 
@@ -57,6 +62,8 @@ volumes:
 
 networks:
   app-network:
+    driver: bridge
+    name: app-network  # Ensures the network is named exactly 'app-network'
 
 secrets:
   mysql_root_password:
