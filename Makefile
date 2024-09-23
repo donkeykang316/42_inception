@@ -1,5 +1,11 @@
-all:
-	# @docker-compose -f ./srcs/docker-compose.yml up --build
+NAME	= inception
+
+all: $(NAME)
+
+$(NAME): up
+
+up:
+	@docker-compose -p $(NAME) -f ./srcs/docker-compose.yml up --build
 
 show:
 	@docker image ls -a && echo "\n" && docker ps -a
