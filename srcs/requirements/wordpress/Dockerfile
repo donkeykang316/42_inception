@@ -7,8 +7,9 @@ ARG		PHPPATH=/etc/php/7.4/fpm
 RUN     apt-get update && \
         apt-get install -y \
 		ca-certificates php7.4-fpm php7.4-mysql wget tar && \
-		service php7.4-fpm stop \
 		rm -rf /var/lib/apt/lists/*
+
+RUN		service php7.4-fpm stop
 
 COPY	conf/www.conf ${PHPPATH}/pool.d/
 
@@ -27,9 +28,9 @@ RUN		mkdir -p /run/php/ && \
 
 RUN		chown -R www-data:www-data /var/www/inception/
 
-COPY    tools/setup.sh /bin/
+COPY	conf/wp-config.php /var/www/inception/
 
-COPY    conf/wp-config.php /var/www/inception/
+COPY    tools/setup.sh /bin/
 
 RUN     chmod +x /bin/setup.sh
 

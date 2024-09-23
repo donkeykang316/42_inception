@@ -1,9 +1,9 @@
 #!/bin/bash
 
-mysql -e "CREATE DATABASE IF NOT EXISTS wordpress;"
-mysql -e "CREATE USER 'wp_user'@'localhost' IDENTIFIED BY 'wp_pass';"
-mysql -e "GRANT ALL PRIVILEGES ON wordpress.* TO 'wp_user'@'localhost';"
-mysql -e "FLUSH PRIVILEGES;"
+# mysql -e "CREATE DATABASE IF NOT EXISTS wordpress;"
+# mysql -e "CREATE USER 'wp_user'@'localhost' IDENTIFIED BY 'wp_pass';"
+# mysql -e "GRANT ALL PRIVILEGES ON wordpress.* TO 'wp_user'@'localhost';"
+# mysql -e "FLUSH PRIVILEGES;"
 chown -R www-data:www-data /var/www/inception/
 
 if [ ! -f /var/www/inception/wp-config.php ]; then
