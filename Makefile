@@ -12,7 +12,7 @@ up:
 	@docker-compose -p $(NAME) -f ./srcs/docker-compose.yml up --build
 
 show:
-	@docker image ls -a && echo "\n" && docker ps -a
+	@docker image ls -a && echo "\n" && docker ps
 
 clean:
 	@docker stop $$(docker ps -qa); \
