@@ -14,6 +14,15 @@ up:
 show:
 	@docker image ls -a && echo "\n" && docker ps
 
+backend:
+	@docker exec -it nginx /bin/sh
+
+db:
+	@docker exec -it mariadb /bin/sh
+
+frontend:
+	@docker exec -it wordpress /bin/sh
+
 clean:
 	@docker stop $$(docker ps -qa); \
 	docker rm $$(docker ps -qa); \

@@ -19,12 +19,20 @@
 ### run muliple containers using docker-compose.yml
 - run docker compose: `docker-compose up`
 
+### access container
+- `docker exec -it container_ID_or_name /bin/sh`
+
+### database login
+- `mysql -u theuser -p thedatabase`
+
+### show DB table
+- `SHOW TABLES;`
 
 ## MariaDB
 
 ### Dockerfile breakdown
 - `FROM` get debian:bullseye image
-- `EXPOSE` this container will be listening on port 3306
+- `EXPOSE` this container will be available on port 3306
 - `RUN` get the all the system update and install mariadb in side the container, clean apt cache for saving disk space
 - `COPY` the local 50-server.conf (contains custom MariaDB server configuration settings) and  the local setup.sh (Mariadb service setup) into the container and `RUN` to to allow the execution right of the setup.sh
 - `CMD` conatiner execute setup.sh and mysqld_safe (a script provided by MariaDB that starts the MariaDB server in a "safe" mode. It is often used to monitor the server and restart it in case of failure.)
@@ -32,13 +40,12 @@
 ### 50-server.cnf breakdown
 - It's a default file
 - file name: The numeric prefix (50-) is used to determine the load order of configuration files. Files are usually loaded in alphanumeric order, so having numbers at the beginning helps control the sequence.  The 50- prefix suggests that this is a mid-level priority configuration file.
-- `server` used for global settings that apply to all MariaDB server instances and plugins
 - `mysqld` main section for configuring the MariaDB server daemon (mysqld). The parameters listed here directly affect the behavior of the MariaDB server, all parameters in this case are default beside the port (port = 3306)
-- `embedded mariadb mariadb-10.3` all default section which are empty in this case
 - File Purpose: customizing Server Behavior, optimizing performance etc.
+- for more configuration see this example [example](https://exampleconfig.com/view/mariadb-ubuntu18-04-etc-mysql-mariadb-conf-d-50-server-cnf)
 
 ### setup.sh breakdown
-- Shebang `#!/bin/bash`: ells the system that the script should be executed using the bash shell
+- Shebang `#!/bin/bash`: tells the system that the script should be executed using the bash shell
 - start the service with `service mariadb start`
 - `mariadb -v -u root << EOF` this initiates an interactive MariaDB session using the root user and execute SQL command as:
  - Creates a new database with the name stored in the $DB_NAME environment variable, but only if it doesn't already exist
@@ -52,6 +59,44 @@
 
 ### Dockerfile breakdown
 - `FROM` get debian:bullseye image
-- `EXPOSE` listen port 9000
+- `EXPOSE` available at port 9000
 - `RUN` download all the dependencies for setting up wordpress: `ca-certificates`  package that provides a set of trusted Certificate Authority (CA) certificates used to verify SSL/TLS connections. `php7.4-fpm` FastCGI Process Manager, it is a version of PHP that is specifically designed to handle and manage web requests more efficiently using the FastCGI protocol. php7.4-fpm is a specific version of PHP designed to handle web requests efficiently and is often used in high-traffic, performance-oriented environments. `php7.4-mysql` is a PHP extension that provides MySQL database support for PHP 7.4. It allows PHP scripts to interact with MySQL databases, enabling them to perform operations like connecting to the database, executing queries, fetching data, and managing database records. This package is essential for any PHP application that needs to work with MySQL databases, such as WordPress or other web applications relying on MySQL for data storage.
-- `sed -i 's/str1/str2/g'` (Stream Editor) modify file content by replacing str1 with str2, flag i make the in file modification possible
+- `sed -i 's/str1/str2/g'` (Stream Editor) modify file content by replacing str1 with str2, flag i make the in file modification possible. The sed "sed script" here sets cgi.fix_pathinfo=0 to enhance security by preventing PHP from misinterpreting path information, Changes the listening address from a Unix socket to port 9000.
+Ensures the socket has the correct permissions (0660).
+Disables daemonization so that PHP-FPM runs in the foreground, which is necessary for Docker containers.
+- `RUN` download the WP-CLI tool, a command-line interface for managing WordPress installations and makes it executable and moves it to /usr/local/bin for global access.
+- `CMD` run the shell script and execute PHP-FPM in the foreground, which is necessary for Docker containers to keep running
+- NOTE: wordpress cannot run without DB
+
+### wp-config.php
+- default file, uses getenv() to retrieve these values from environment variables, enhancing security by avoiding hard-coded credentials
+- [file guide](https://developer.wordpress.org/apis/wp-config-php/)
+
+### www.conf
+- also known as PHP-FPM (FastCGI Process Manager) pool or look for PHP configuration for guidline like [this one](https://www.php.net/manual/en/install.fpm.configuration.php)
+
+### setup.sh
+- Set Permissions: Ensures the web directory has the correct ownership.
+- Configure WordPress: Moves the configuration file if it doesn't exist.
+- Wait for Dependencies: Pauses execution to allow other services (like the database) to initialize.
+Download WordPress Core: Downloads WordPress if it's not already present.
+- Install WordPress: Runs the WordPress installation if it's not already installed.
+Create an Admin User: Adds an additional WordPress user if it doesn't exist.
+- Execute the Main Command: Starts the PHP-FPM process to keep the container running.
+
+## nginx
+
+### Dockerfile breakdown
+- `RUN` install nginx and openssl which is essential for generating SSL/TLS certificates
+- `ARG` declares build-time variables that can be passed to the Docker build process from the .env. CERT_FOLDER: Directory where SSL certificates will be stored.
+CERTIFICATE: Path to the SSL certificate file.
+KEY: Path to the SSL key file.
+COUNTRY, STATE, LOCALITY, ORGANIZATION, UNIT, COMMON_NAME (DOMAIN_NAME): Components of the SSL certificate's subject information.
+- `RUN` openssl req: Generates a new SSL certificate and key. -newkey rsa:4096: Creates a new RSA key of 4096 bits. -x509: Outputs a self-signed certificate instead of a certificate request. -sha256: Uses SHA-256 for hashing. -days 365: Sets the certificate validity period to 365 days. -nodes: Skips the option to secure the private key with a passphrase. -out ${CERTIFICATE}: Specifies the output certificate file. -keyout ${KEY}: Specifies the output key file. -subj: Defines the subject fields for the certificate
+- `RUN echo "\tserver name ${COMMON_NAME}; ...` Appends SSL-related directives to the server.conf
+
+### nginx.conf
+
+### server.conf
+
+## docker compose
