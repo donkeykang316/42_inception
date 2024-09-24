@@ -95,8 +95,30 @@ COUNTRY, STATE, LOCALITY, ORGANIZATION, UNIT, COMMON_NAME (DOMAIN_NAME): Compone
 - `RUN` openssl req: Generates a new SSL certificate and key. -newkey rsa:4096: Creates a new RSA key of 4096 bits. -x509: Outputs a self-signed certificate instead of a certificate request. -sha256: Uses SHA-256 for hashing. -days 365: Sets the certificate validity period to 365 days. -nodes: Skips the option to secure the private key with a passphrase. -out ${CERTIFICATE}: Specifies the output certificate file. -keyout ${KEY}: Specifies the output key file. -subj: Defines the subject fields for the certificate
 - `RUN echo "\tserver name ${COMMON_NAME}; ...` Appends SSL-related directives to the server.conf
 
-### nginx.conf
-
-### server.conf
+### nginx.conf and server.conf
+- You can try with [digitalocean](https://www.digitalocean.com/community/tools/nginx?domains.0.server.domain=login.42.fr&domains.0.php.phpServer=%2Fvar%2Frun%2Fphp%2Fphp7.4-fpm.sock&domains.0.php.phpBackupServer=%2Fvar%2Frun%2Fphp%2Fphp7.4-fpm.sock&global.app.lang=de) for generating both of the file or just use mine
 
 ## docker compose
+
+### Overview
+- the docker compose configuration defines three primary services: MariaDB: Acts as the database server for WordPress. WordPress: Runs the WordPress application, utilizing PHP-FPM for processing. Nginx: Serves as the reverse proxy and web server, handling HTTP/HTTPS requests and forwarding them to WordPress.
+
+### MariaDB Service
+- the container need a name for easy identification. `build` will look for the docker file from the given path. `volumes` is where the database files will be saved in the container. `networks` Connects the MariaDB service to the all network, in this case with wordpress and nginx. `init` is used to run the setup.sh, restart is used to restart the container if it fails, and env_file is the file that contains the variables that will be used in the container
+
+### Wordpress Service
+- the wordpress service is similar to the mariadb service, but it has a depends_on field that indicates that the wordpress container will only start after the mariadb container is running.
+
+### nginx Service
+
+- `build: context:` looks for the corresponding docker. `args` passes build-time variables to the Docker build process, when building the image, these arguments are set via environment variables defined in the .env file or directly in the command line. The rest are similiar like wordpress setup
+
+### Volumes
+
+- define the local  that will be used to save the database and the wordpress files. The subject informs that the data must be in user home directory. This volumes will work like a shared folder between the host and the containers
+
+### Networks
+
+- defines a custom network named all using Docker's bridge driver which is the docker's default bridge network driver. The bridge provides network isolation and allows containers to communicate with each other.
+
+## Huge aprreciation of the guide line from [waltergcc](https://github.com/waltergcc/42-inception?tab=readme-ov-file#13-nginx)
