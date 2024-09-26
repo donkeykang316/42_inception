@@ -5,6 +5,16 @@
 ### in case the permision denial when running "docker version"
 - check the if the user within the docker user group: `getent group docker`
 - add user to the docker group: `sudo usermod -aG docker $USER`
+
+### in case the docker compose execution error
+- check the build of docker compose `docker-compose --version`
+- id the build is shown unknow, execute the following shell scripts
+- `DOCKER_COMPOSE_VERSION=$(curl -Ls "https://api.github.com/repos/docker/compose/releases/latest" | grep -Po '"tag_name": "\K[^\s,]*' | sed 's/^v//')
+sudo curl -L "https://github.com/docker/compose/releases/download/v$DOCKER_COMPOSE_VERSION/docker-compose-linux-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose`
+- `sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose`
+
 ### run docker
 - create docker image by running the docker file: `docker build -t program_name program_path` "." for current path
 - check image details: `docker image ls`
