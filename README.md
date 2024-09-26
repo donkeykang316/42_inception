@@ -8,7 +8,7 @@
 
 ### in case the docker compose execution error
 - check the build of docker compose `docker-compose --version`
-- id the build is shown unknow, execute the following shell scripts
+- id the build is shown unknow, execute the following shell scripts line by line
 - `DOCKER_COMPOSE_VERSION=$(curl -Ls "https://api.github.com/repos/docker/compose/releases/latest" | grep -Po '"tag_name": "\K[^\s,]*' | sed 's/^v//')
 sudo curl -L "https://github.com/docker/compose/releases/download/v$DOCKER_COMPOSE_VERSION/docker-compose-linux-$(uname -m)" -o /usr/local/bin/docker-compose`
 - `sudo chmod +x /usr/local/bin/docker-compose`
