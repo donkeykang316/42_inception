@@ -18,7 +18,7 @@ sudo curl -L "https://github.com/docker/compose/releases/download/v$DOCKER_COMPO
 ### run docker
 - create docker image by running the docker file: `docker build -t image_name dockerfile_path` "." for current path
 - check image details: `docker image ls`
-- run the program from the container: `docker run -p port:port image`
+- run the program from the container: `docker run -p port:port image_name`
 
 ### containers cleanup
 - clear all running containers: `docker stop $(docker ps -qa); docker rm $(docker ps -qa); docker rmi -f $(docker images -qa); docker volume rm $(docker volume ls -q); docker network rm $(docker network ls -q) 2>/dev/null`
